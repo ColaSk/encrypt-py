@@ -26,18 +26,23 @@ class EncryptPyBase:
     def __init__(self, 
             input: str, 
             output: str, 
-            ignored: List = None) -> None:
+            ignored: List = None,
+            ignore_pf: List = None) -> None:
         
         """
         * input_path : 输入路径 可以为文件夹 可以为文件
         * output_path ： 输出路径 必须为文件夹
-        * ignored ：忽略的文件
+        * ignored ：忽略的文件或文件夹，将不会copy到编译项目下
+        * ignore_pf ：忽略的文件，将不会被加密，但是保存在编译目录下
         """
         self.input = input
         self.output = output
         self.ignored = ignored
+        self.ignore_pf = ignore_pf if ignore_pf else []
+
     
     def copyproject(self):
+        """拷贝项目到目标文件夹"""
 
         if os.path.exists(self.output):
             shutil.rmtree(self.output)
@@ -51,12 +56,17 @@ class EncryptPyBase:
         """搜索可被加密的文件"""
 
         for root, _, files in os.walk(self.output):
-            
             for filename in files:
                 path = os.path.join(root, filename)
-                if not filename.endswith('.py') or filename in ['__init__.py']:
+
+                # TODO: 希望支持正则法则
+                if (not filename.endswith('.py') or 
+                    filename in ['__init__.py'] or 
+                    filename in self.ignore_pf):
+
                     logger.warning(f'Exclude file: {root}/{filename} not build')
                     continue
+                
                 yield path
     
     @abstractmethod
