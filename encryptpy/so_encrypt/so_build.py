@@ -20,8 +20,7 @@ from distutils.core import setup
 
 from Cython.Build import cythonize
 from encryptpy.base import EncryptPyBase
-from utils import TempDirContext
-
+from encryptpy.utils import TempDirContext, running_time
 
 def get_package_dir(*args, **kwargs):
     return ""
@@ -74,13 +73,15 @@ class SOEncryptPy(EncryptPyBase):
 
         os.remove(py_file)
 
-        if py_file.endswith('.py'):
-            c_file = py_file.replace('.py', '.c')
-        else:
-            c_file = py_file.replace('.pyx', '.c')
+        if not self.keep_step:
 
-        if os.path.exists(c_file):
-            os.remove(c_file)
+            if py_file.endswith('.py'):
+                c_file = py_file.replace('.py', '.c')
+            else:
+                c_file = py_file.replace('.pyx', '.c')
+
+            if os.path.exists(c_file):
+                os.remove(c_file)
     
     def gen_search_refiles(self):
         """搜索需要重命名的.so文件"""
@@ -92,7 +93,8 @@ class SOEncryptPy(EncryptPyBase):
                 if not filename.endswith('.so'):
                     continue
                 yield path
-
+    
+    @running_time
     def execute(self):
         """加密执行
         1.拷贝项目
@@ -107,8 +109,11 @@ class SOEncryptPy(EncryptPyBase):
         # encrypt py -> .so
         # del intermediate file .c
         tasks = []
-        with ProcessPoolExecutor(max_workers=8) as pool:
-            for filepath in self.gen_searchfiles():
+        
+        # 通过多进程解决同文件编译问题
+        # TODO:由于进程创建销毁过程导致性能损耗问题，需要解决
+        for filepath in self.gen_searchfiles():
+            with ProcessPoolExecutor(max_workers=1) as pool:
                 task = pool.submit(self.encrypt, filepath)
                 tasks.append(task)
         

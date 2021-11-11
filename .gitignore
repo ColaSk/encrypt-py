@@ -2,3 +2,6 @@
 .idea
 __pycache__
 build.log
+build
+dist
+Encrypt_py.egg-info

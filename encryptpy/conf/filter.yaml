@@ -1,0 +1,10 @@
+version: 1.0.0
+
+input: /home/sk/project/solar_platform/solar_iter_api_original
+output: /home/sk/project/solar_platform/solar_iter_api
+type: '1'
+keep_step: True
+
+filter:
+  ignored: [.git, __pycache__, .vscode, tests, migrations, __pycache__]
+  ignore_pf: [server.py, config.py]

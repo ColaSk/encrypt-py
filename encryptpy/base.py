@@ -27,18 +27,22 @@ class EncryptPyBase:
             input: str, 
             output: str, 
             ignored: List = None,
-            ignore_pf: List = None) -> None:
+            ignore_pf: List = None,
+            *args, **kwargs) -> None:
         
         """
         * input_path : 输入路径 可以为文件夹 可以为文件
         * output_path ： 输出路径 必须为文件夹
         * ignored ：忽略的文件或文件夹，将不会copy到编译项目下
         * ignore_pf ：忽略的文件，将不会被加密，但是保存在编译目录下
+        * keep_step: 保留中间过程文件
         """
         self.input = input
         self.output = output
         self.ignored = ignored
         self.ignore_pf = ignore_pf if ignore_pf else []
+        self.max_workers = kwargs.get('max_workers', 8)
+        self.keep_step =  kwargs.get('keep_step', False)
 
     
     def copyproject(self):
