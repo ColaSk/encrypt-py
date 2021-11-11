@@ -11,31 +11,38 @@
 
 # here put the import lib
 
-import os
 import logging
-import sys
-import traceback
+import os
 import re
-import shutil
-
-from typing import Union, List
-from utils import TempDirContext
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from distutils.command.build_py import build_py
 from distutils.core import setup
+
 from Cython.Build import cythonize
 from encryptpy.base import EncryptPyBase
+from utils import TempDirContext
+
+
+def get_package_dir(*args, **kwargs):
+    return ""
+
+# TODO ? 重写get_package_dir， 否则生成的so文件路径有问题
+build_py.get_package_dir = get_package_dir
 
 logger = logging.getLogger(__name__)
 
 class SOEncryptPy(EncryptPyBase):
     """.so 加密python项目"""
-
+   
     COMPILER_DIRECTIVES = {
-        'language_level': 3, 
-        'always_allow_keywords': True, 
-        'annotation_typing': False
+        'language_level': 3,              # 语言版本
+        'always_allow_keywords': True,    # 
+        'annotation_typing': False        # 禁止强制类型验证
     }
         
     def encrypt(self, py_file):
+
+        logger.info(f'file: {py_file} Execution starting')
 
         dir_name = os.path.dirname(py_file)
         file_name = os.path.basename(py_file)
@@ -48,7 +55,11 @@ class SOEncryptPy(EncryptPyBase):
                 script_args=['build_ext', '-t', dc, '--inplace']
             )
 
-            logger.info(f'Success: {py_file} build success')
+        self.del_step_file(py_file)
+
+        logger.info(f'file: {py_file} Execution complete')
+        
+        return py_file, True
 
     def rename_so(self, filepath):
         """重命名.so文件"""
@@ -89,16 +100,27 @@ class SOEncryptPy(EncryptPyBase):
         3.删除源文件与中间文件
         4.对.so文件重命名
         """
-
+        logger.info('Encryption start'.center(100, '*'))
         # copy input -> output
         self.copyproject()
         
         # encrypt py -> .so
         # del intermediate file .c
-        for filepath in self.gen_searchfiles():
-            self.encrypt(filepath)
-            self.del_step_file(filepath)
+        tasks = []
+        with ProcessPoolExecutor(max_workers=8) as pool:
+            for filepath in self.gen_searchfiles():
+                task = pool.submit(self.encrypt, filepath)
+                tasks.append(task)
         
+        for task in as_completed(tasks):
+            try:
+                re_file, rt = task.result()
+                logger.info(f'file: {re_file} build success, RESULT: {rt}')
+            except Exception as e:
+                logger.error(f'unknown error: {e.__str__()}')
+                
         # rename .so
-        for filepath in self.gen_search_refiles():
-            self.rename_so(filepath)
+        # for filepath in self.gen_search_refiles():
+        #     self.rename_so(filepath)
+        
+        logger.info('Encryption end'.center(100, '*'))
