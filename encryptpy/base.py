@@ -8,16 +8,15 @@
 @License :   (C)Copyright 2017-2018, Liugroup-NLPR-CASIA
 @Desc    :   None
 '''
-
 # here put the import lib
-import re
-import os
+
 import logging
 
-from shutil import copytree, ignore_patterns
+import os
 import shutil
-from typing import Union, List
 from abc import abstractmethod
+from shutil import copytree, ignore_patterns
+from typing import List
 
 logger = logging.getLogger(__name__)
 

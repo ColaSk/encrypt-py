@@ -1,15 +1,14 @@
-"""solar_iter_api 测试"""
+import argparse
 import logging
 import logging.config
-import argparse
 import os
+
 import yaml
 
 from encryptpy import SOEncryptPy
 from encryptpy.conf.logconf import logconfig
-from encryptpy.conf.setting import EncryptType, Setting as setting
-
-# logging.config.dictConfig(logconfig)
+from encryptpy.conf.setting import EncryptType
+from encryptpy.conf.setting import Setting as setting
 
 
 def init_args():

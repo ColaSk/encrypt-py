@@ -1,1 +1,1 @@
-from .so_encrypt.so_build import SOEncryptPy
+from .so_encrypt import SOEncryptPy

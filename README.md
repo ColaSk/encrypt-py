@@ -55,7 +55,7 @@
 
 ### -d IGNORED [IGNORED ...], --ignored IGNORED [IGNORED ...]
 
-> 排除的文件夹目录, 当前仅支持目录名称，后续增加正则
+> 排除的文件夹目录, 支持正则
 > 默认：[.git, __pycache__, .vscode, tests, migrations, __pycache__]
 
 ###  -f IGNORE_PF [IGNORE_PF ...], --ignore_pf IGNORE_PF [IGNORE_PF ...]
