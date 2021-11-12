@@ -21,6 +21,6 @@ def running_time(func):
         curr_time = datetime.now()
         rt = func(*args, **kwargs)
         run_time = (datetime.now()-curr_time).seconds
-        logger.info(f'{func.__name__} running time: {run_time}')
+        logger.info(f'{func.__name__} running time: {run_time} s')
         return rt
     return inner
