@@ -13,7 +13,16 @@
 
 - 可支持的加密方式
   - [x] py->.so
-  - 代码混淆 (未完成)
+  - [ ] 代码混淆 (未完成)
+
+## 问题
+
+### 方案一
+
+  - 编译的python版本必须与运行版本一致
+  - 加密相同名称的文件时包的构建会出错，解决方案为通过不同的进程进行加密，需要尽可能保证项目内文件的互异性
+    - 脚本方式
+    - 多进程方案
 
 # 用法
 
@@ -54,10 +63,16 @@
 > 排除不需要加密的python文件,目前仅支持文件名，后续增加正则
 > 默认：[server.py, config.py]
 
+### -l LOGFILE, --logfile LOGFILE
+
+> log文件路径
+> 默认./build.log
+
 ### -c CONFIG, --config CONFIG
 
 > 支持配置文件，目前仅支持yaml文件，下文详细说明配置方法
 > 需要注意的是应用配置文件其他参数将失效切记
+
 
 
 ## yaml文件配置
@@ -68,8 +83,8 @@ version: 1.0.0
 input: /home/sk/project/solar_platform/solar_iter_api_original
 output: /home/sk/project/solar_platform/solar_iter_api
 type: '1'
-keep_step: True
-
+keep_step: False
+logfile: './build.log'
 filter:
   ignored: [.git, __pycache__, .vscode, tests, migrations, __pycache__]
   ignore_pf: [server.py, config.py]
